@@ -9,7 +9,7 @@ from flask import Flask, request, Response
 from redis import Redis
 from tasks import process_message
 from logger import log
-from celery_worker import celery  # 🔄 nouvelle import
+from celery_worker import celery
 
 API_KEY = os.getenv("API_KEY")
 DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
@@ -17,7 +17,6 @@ LOG_FILE = "/tmp/log.txt"
 
 app = Flask(__name__)
 
-# ✅ Connexion Redis
 REDIS_URL = os.getenv("REDIS_URL")
 redis_conn = Redis.from_url(REDIS_URL)
 
@@ -33,7 +32,6 @@ def sms_auto_reply():
 
     log(f"[{request_id}] 🔎 messages brut : {messages_raw}")
 
-    # ✅ Signature
     if not DEBUG_MODE:
         signature = request.headers.get("X-SG-SIGNATURE")
         if not signature:
@@ -49,7 +47,6 @@ def sms_auto_reply():
             return "Signature invalide", 403
         log(f"[{request_id}] ✅ Signature valide")
 
-    # ✅ Parsing JSON
     try:
         messages = json.loads(messages_raw)
         log(f"[{request_id}] ✔️ messages parsés : {messages}")
@@ -61,7 +58,6 @@ def sms_auto_reply():
         log(f"[{request_id}] ❌ Format JSON non liste")
         return "Liste attendue", 400
 
-    # ✅ Mise en file Celery avec délai aléatoire (60 à 180 sec)
     for i, msg in enumerate(messages):
         try:
             delay = random.randint(60, 180)
