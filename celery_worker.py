@@ -4,14 +4,12 @@ from logger import log
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-# 🔒 Gérer SSL si rediss:// est utilisé
 ssl_options = {}
 if REDIS_URL.startswith("rediss://"):
     ssl_options = {
-        "ssl_cert_reqs": "none"  # Pour Upstash, aucun certificat requis
+        "ssl_cert_reqs": "none"
     }
 
-# ✅ Initialisation de Celery
 celery = Celery(
     "sms_auto_reply",
     broker=REDIS_URL,
@@ -30,7 +28,6 @@ celery.conf.update(
     redis_backend_use_ssl=ssl_options if REDIS_URL.startswith("rediss://") else None,
 )
 
-# ✅ Log au démarrage
 try:
     log("✅ Celery initialisé avec succès (broker & backend Redis)")
 except Exception as e:
