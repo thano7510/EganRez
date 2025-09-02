@@ -2,13 +2,13 @@ import os
 import json
 from redis import Redis
 from logger import log
-from celery_worker import celery  # 🔁 Import du Celery app
+from celery_worker import celery  
 
 SERVER = os.getenv("SERVER")
 API_KEY = os.getenv("API_KEY")
 SECOND_MESSAGE_LINK = os.getenv("SECOND_MESSAGE_LINK")
 
-# ✅ Connexion Redis
+
 REDIS_URL = os.getenv("REDIS_URL")
 redis_conn = Redis.from_url(REDIS_URL)
 
